@@ -22,23 +22,27 @@ namespace Algorithm_Visualizer
     /// </summary>
     public partial class MainWindow : Window
     {
-        public PathFindingAlgorithm pathAlgo;
-        public SortingAlgorithm bubbleAlgo;
+        public PathFindingAlgorithm aStarAlgo;
+        public PathFindingAlgorithm dijktrasAlgo;
+        public SortingAlgorithm bubbleAlgo;        
         public SortingAlgorithm selectionAlgo;
-        public SortingAlgorithm insertionAlgo;
+        public SortingAlgorithm insertionAlgo;        
         public int rows = 50;
         public int cols = 100;
         public MainWindow()
         {
             InitializeComponent();
             AllocConsole();            
-            pathAlgo = new AStarAlgorithm(aStarGrid, rows, cols);
+            aStarAlgo = new AStarAlgorithm(aStarGrid, rows, cols);
+            dijktrasAlgo = new DijktrasAlgorithm(dijktrasGrid, rows, cols);
             bubbleAlgo = new BubbleSortAlgorithm(1000, bubblePanel, tabs);                  
             selectionAlgo = new SelectionSortAlgorithm(1000, selectionPanel, tabs);
             insertionAlgo = new InsertionSortAlgorithm(1000, insertionPanel, tabs);
-            InitNodes(pathAlgo);    // idk why but this has to happen but cause of c# I guess idk            
+            InitNodes(aStarAlgo);    // idk why but this has to happen but cause of c# I guess idk     
+            InitNodes(dijktrasAlgo);
             // add the algorithm application loop to the rendering composition so this will be the "game loop"            
-            CompositionTarget.Rendering += pathAlgo.AlgorithmLoop;            
+            CompositionTarget.Rendering += aStarAlgo.AlgorithmLoop;
+            CompositionTarget.Rendering += dijktrasAlgo.AlgorithmLoop;
             CompositionTarget.Rendering += bubbleAlgo.ApplicationLoop;
             CompositionTarget.Rendering += selectionAlgo.ApplicationLoop;
             CompositionTarget.Rendering += insertionAlgo.ApplicationLoop;
@@ -50,7 +54,6 @@ namespace Algorithm_Visualizer
         }
         // enable the console window for debugging purposes
         [DllImport("Kernel32")]
-        public static extern void AllocConsole();
-        
+        public static extern void AllocConsole();        
     }
 }

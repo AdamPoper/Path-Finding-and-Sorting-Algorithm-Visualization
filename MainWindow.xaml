@@ -13,16 +13,20 @@
                 <Grid Name="aStarGrid">
                 </Grid>
             </TabItem>
+            <TabItem Name="dijktrasTab" Header="Dijkstras" TabIndex="1">
+                <Grid Name="dijktrasGrid">
+                </Grid>
+            </TabItem>
             <TabItem Name="selectionTab" Header="SelectionSort" TabIndex="2">
                 <StackPanel Name="selectionPanel" Orientation="Horizontal" Height="800" Width="1700">
                     <Rectangle/>
                 </StackPanel>
             </TabItem>
-            <TabItem Name="bubbleTab" Header="BubbleSort" TabIndex="1">
+            <TabItem Name="bubbleTab" Header="BubbleSort" TabIndex="3">
                 <StackPanel Name="bubblePanel" Orientation="Horizontal" Height="800" Width="1700">
                 </StackPanel>
             </TabItem>
-            <TabItem Name="insertionTab" Header="insertionSort" TabIndex="3">
+            <TabItem Name="insertionTab" Header="insertionSort" TabIndex="4">
                 <StackPanel Name="insertionPanel" Orientation="Horizontal" Height="800" Width="1700">
                 </StackPanel>
             </TabItem>

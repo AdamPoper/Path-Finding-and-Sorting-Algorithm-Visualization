@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 namespace Algorithm_Visualizer
 {
     /// <summary>
-    /// An algorithm contains the neccessary UI stuff, the grid layout, rows, and columns, and formatting of the nodes
+    /// A pathfinding algorithm contains the neccessary UI stuff, the grid layout, rows, and columns, and formatting of the nodes
     /// I figured it didn't matter where I put it so it goes in the algorithm class just so it's easy
     /// </summary>
     public class PathFindingAlgorithm
@@ -68,7 +68,7 @@ namespace Algorithm_Visualizer
             }
         }
         // find the neighbors of the current 
-        public void findNeighbors(Node currentNode, List<Node> open, List<Node> closed, Node startNode, Node endNode)
+        public List<Node> findNeighbors(Node currentNode)
         {
             List<Node> neighbors = new List<Node>();
             { // up
@@ -91,21 +91,8 @@ namespace Algorithm_Visualizer
                     if (n.col == currentNode.col + 1 && n.row == currentNode.row)
                         neighbors.Add(n);                
             }
-            // neighbors only get added to the open list if they are not already part of the open list or closed list and is not blocked
-            foreach(Node n in neighbors)
-            {
-                if (!closed.Contains(n) && !open.Contains(n) && !n.blocked)
-                {
-                    float newGCost = calculateGCost(n, startNode);
-                    if(newGCost < n.g)    // only update it's gCost if the new gCost is less than its current gCost
-                        n.g = newGCost;
-                    n.h = calculateHCost(n, endNode);
-                    n.f = n.g + n.h;
-                    n.parent = currentNode;
-                    n.setColor(Node.Green);
-                    open.Add(n);                                                       
-                }
-            }
+            
+            return neighbors;
         }
         // both of these use pythagorus
         public float calculateGCost(Node node, Node startNode)
@@ -213,8 +200,123 @@ namespace Algorithm_Visualizer
                     retracePath(startNode, endNode);
                 }
                 if (!finished)
-                    findNeighbors(currentNode, open, closed, startNode, endNode);
+                {
+                    List<Node> neighbors = findNeighbors(currentNode);
+                    // neighbors only get added to the open list if they are not already part of the open list or closed list and is not blocked
+                    foreach (Node n in neighbors)
+                    {
+                        if (!closed.Contains(n) && !open.Contains(n) && !n.blocked)
+                        {
+                            float newGCost = calculateGCost(n, startNode);
+                            if (newGCost < n.g)    // only update it's gCost if the new gCost is less than its current gCost
+                                n.g = newGCost;
+                            n.h = calculateHCost(n, endNode);
+                            n.f = n.g + n.h;
+                            n.parent = currentNode;
+                            n.setColor(Node.Green);
+                            open.Add(n);
+                        }
+                    }
+                }
             }
         }       
+    }
+    public class DijktrasAlgorithm : PathFindingAlgorithm
+    {
+        public static bool isStartDefined { get; set; }
+        public static bool isEndDefined { get; set; }
+        public static bool finished { get; set; }
+        public Node currentNode;
+        public Node startNode;
+        public Node endNode;
+        public List<Node> open;
+        private List<Node> closed;
+        public DijktrasAlgorithm(Grid grid, int rows, int cols)
+        {
+            this.grid = grid;
+            this.rows = rows;
+            this.cols = cols;
+            this.grid.Width = 1600;
+            this.grid.Height = 800;
+            this.algoType = Algorithms.DIJKSTRAS;
+            closed = new List<Node>();
+            open = new List<Node>();
+            Init();
+            foreach (Node n in nodes)
+                open.Add(n);
+        }
+        static DijktrasAlgorithm()
+        {
+            isEndDefined = false;
+            isStartDefined = false;
+            finished = true;
+        }
+        public void DefineStartEnd()
+        {
+            foreach (Node n in this.nodes)
+            {
+                if (n.isEnd)
+                {
+                    endNode = n;
+                    isEndDefined = true;
+                }
+                if (n.isStart)
+                {
+                    if(!isStartDefined)
+                        foreach(Node v in open)
+                            if(!v.isStart)
+                                v.dist = float.MaxValue;                   
+                    startNode = n;
+                    startNode.dist = 0;
+                    isStartDefined = true;
+                }
+            }
+        }        
+        public override void AlgorithmLoop(object sender, EventArgs e)
+        {
+            if (!isStartDefined || !isEndDefined)
+            {
+                DefineStartEnd();
+                if (isStartDefined && isEndDefined)
+                {
+                    currentNode = startNode;
+                    open.Add(currentNode);
+                    finished = false;
+                }
+            }
+            if(open.Count > 0 && !finished)
+            {                
+                Node lowestDistNode = nodes[0];
+                foreach (Node n in open)
+                    if (n.dist <= lowestDistNode.dist && !closed.Contains(n))
+                        lowestDistNode = n;
+                currentNode = lowestDistNode;
+                currentNode.setColor(Node.Red);
+                open.Remove(currentNode);
+                closed.Add(currentNode);
+                if (currentNode == endNode)
+                {
+                    finished = true;
+                    Console.WriteLine("Found");
+                    retracePath(startNode, endNode);
+                }
+                else
+                {
+                    List<Node> neighbors = findNeighbors(currentNode);                    
+                    foreach(Node n in neighbors)
+                    {
+                        if (n.blocked || closed.Contains(n) || (n.col == 0 && n.row == 0)) // node (0, 0) causes problems for some reason
+                            continue;
+                        n.dist = currentNode.dist + 1.0f;
+                        n.setColor(Node.Green);
+                        //float altDist = currentNode.dist + n.dist;
+                        //if (altDist < n.dist)
+                        //    n.dist = altDist;
+                        n.parent = currentNode;
+                    }
+                }
+            }
+        }
+        
     }
 }

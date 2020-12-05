@@ -30,9 +30,10 @@ namespace Algorithm_Visualizer
         public bool blocked { get; set; }
         public bool isStart { get; set; }
         public bool isEnd { get; set; }
-        public float g { get; set; }
-        public float h { get; set; }
-        public float f { get; set; }
+        public float g { get; set; }  /// <summary>
+        public float h { get; set; }  ///  These values are for the a star algorithm    
+        public float f { get; set; }  /// </summary>
+        public float dist { get; set; }  // for dijkstras
         public static PathFindingAlgorithm.Algorithms activeAlgorithm;
         public Node parent;
         public Node()
@@ -83,7 +84,8 @@ namespace Algorithm_Visualizer
             // there's lots of inheritence going on here and mouse and keyboard inputs must be handled by the Node class
             // this function needs to filter out which algorithm is being performed so the events are handled properly
 
-            if (Mouse.LeftButton == MouseButtonState.Pressed && (Node.activeAlgorithm == PathFindingAlgorithm.Algorithms.A_STAR)) // add dijkstra'a later
+            // For A Star
+            if (Mouse.LeftButton == MouseButtonState.Pressed) 
             {
                 if (Keyboard.IsKeyDown(Key.S) && !AStarAlgorithm.isStartDefined)
                 {
@@ -102,6 +104,27 @@ namespace Algorithm_Visualizer
                     setColor(Node.Black);
                     this.blocked = true;
                 }               
+            }
+            // For dijkstras
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            {
+                if (Keyboard.IsKeyDown(Key.S) && !DijktrasAlgorithm.isStartDefined)
+                {
+                    setColor(Node.Blue);
+                    this.isStart = true;
+                    Console.WriteLine("Setting the start node");
+                }
+                else if (Keyboard.IsKeyDown(Key.E) && !DijktrasAlgorithm.isEndDefined)
+                {
+                    setColor(Node.Purple);
+                    this.isEnd = true;
+                    Console.WriteLine("Setting the end node");
+                }
+                else
+                {
+                    setColor(Node.Black);
+                    this.blocked = true;
+                }
             }
         }       
     }

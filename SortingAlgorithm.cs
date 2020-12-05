@@ -74,7 +74,7 @@ namespace Algorithm_Visualizer
         public override void ApplicationLoop(object sender, EventArgs e)
         {
             // doesn't use nested loops because the application loop is already doing the first loop but the algorithm is still that same
-            if (Keyboard.IsKeyDown(Key.Space) && tabs.SelectedIndex == 2)
+            if (Keyboard.IsKeyDown(Key.Space) && tabs.SelectedIndex == 3)
                 started = true;            
             if(started)
             {          
@@ -102,7 +102,7 @@ namespace Algorithm_Visualizer
         }
         public override void ApplicationLoop(object sender, EventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Space) && tabs.SelectedIndex == 1)
+            if (Keyboard.IsKeyDown(Key.Space) && tabs.SelectedIndex == 2)
                 started = true;
             if(started)
             {
@@ -130,7 +130,7 @@ namespace Algorithm_Visualizer
         }
         public override void ApplicationLoop(object sender, EventArgs e)
         {            
-            if (Keyboard.IsKeyDown(Key.Space) && tabs.SelectedIndex == 3)
+            if (Keyboard.IsKeyDown(Key.Space) && tabs.SelectedIndex == 4)
                 started = true;
             if(started)
             {                
