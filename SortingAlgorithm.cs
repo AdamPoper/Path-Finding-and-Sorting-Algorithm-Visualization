@@ -34,7 +34,7 @@ namespace Algorithm_Visualizer
             started = false;
             Init();
         }
-        public void swap(int index1, int index2)
+        protected void swap(int index1, int index2)
         {
             double temp = rectangles[index1].Height;
             rectangles[index1].Height = rectangles[index2].Height;
@@ -43,7 +43,7 @@ namespace Algorithm_Visualizer
         public virtual void ApplicationLoop(object sender, EventArgs e)
         {
         }
-        public void Init()
+        protected void Init()
         {
             rectangles = new Rectangle[this.count];
             var random = new Random();
@@ -57,6 +57,12 @@ namespace Algorithm_Visualizer
                 rectangles[i].VerticalAlignment = VerticalAlignment.Bottom;
                 panel.Children.Add(rectangles[i]);
             }
+        }
+        public void UpdateBarCount(int count)
+        {
+            this.count = count;
+            panel.Children.Clear();
+            Init();
         }
     }
     public class BubbleSortAlgorithm : SortingAlgorithm

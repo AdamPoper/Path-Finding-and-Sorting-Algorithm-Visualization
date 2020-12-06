@@ -17,7 +17,7 @@ namespace Algorithm_Visualizer
 {
     /// <summary>
     /// A pathfinding algorithm contains the neccessary UI stuff, the grid layout, rows, and columns, and formatting of the nodes
-    /// I figured it didn't matter where I put it so it goes in the algorithm class just so it's easy
+    /// I figured it didn't matter where I put it so it goes in the path finding algorithm class just so it's easy
     /// </summary>
     public class PathFindingAlgorithm
     {
@@ -26,23 +26,29 @@ namespace Algorithm_Visualizer
             A_STAR = 0,
             DIJKSTRAS = 1
         }
-        public Grid grid;
+        protected Grid grid;
         public List<Node> nodes;
         public int rows { get; set; }
         public int cols { get; set; }
         public Algorithms algoType;
+        
+        protected Node currentNode;
+        protected Node startNode;
+        protected Node endNode;
+        protected List<Node> open;
+        protected List<Node> closed;
         public PathFindingAlgorithm()
         {
-            this.rows = 10;
-            this.cols = 10;            
+            rows = 10;
+            cols = 10;            
         }
         public PathFindingAlgorithm(Grid grid, int rows, int cols)
         {
             this.grid = grid;
             this.rows = rows;
             this.cols = cols;
-            this.grid.Width = 600;
-            this.grid.Height = 600;
+            this.grid.Width = 1600;
+            this.grid.Height = 800;
             Init();
         }
         protected void Init()
@@ -51,8 +57,7 @@ namespace Algorithm_Visualizer
                 this.grid.ColumnDefinitions.Add(new ColumnDefinition());
             for (int i = 0; i < rows; i++)
                 this.grid.RowDefinitions.Add(new RowDefinition());
-            nodes = new List<Node>();
-            int n = 0;
+            nodes = new List<Node>();            
             for (int x = 0; x < cols; x++)
             {
                 for (int y = 0; y < rows; y++)
@@ -63,12 +68,11 @@ namespace Algorithm_Visualizer
                     Grid.SetRow(node.rect, y);
                     this.grid.Children.Add(node.rect);
                     nodes.Add(node);
-                    n++;
                 }
             }
         }
         // find the neighbors of the current 
-        public List<Node> findNeighbors(Node currentNode)
+        protected List<Node> findNeighbors(Node currentNode)
         {
             List<Node> neighbors = new List<Node>();
             { // up
@@ -95,19 +99,19 @@ namespace Algorithm_Visualizer
             return neighbors;
         }
         // both of these use pythagorus
-        public float calculateGCost(Node node, Node startNode)
+        protected float calculateGCost(Node node, Node startNode)
         {
             float x = Math.Abs(startNode.col - node.col);
             float y = Math.Abs(startNode.row - node.row);
             return (float)Math.Sqrt((x * x) + (y * y));
         }
-        public float calculateHCost(Node node,Node endNode)
+        protected float calculateHCost(Node node,Node endNode)
         {
             float x = Math.Abs(endNode.col - node.col);
             float y = Math.Abs(endNode.row - node.row);
             return (float)Math.Sqrt((x * x) + (y * y));
         }
-        public void retracePath(Node start, Node end)
+        protected void retracePath(Node start, Node end)
         {
             Node n = end;
             while(n != start)
@@ -116,7 +120,35 @@ namespace Algorithm_Visualizer
                 n = n.parent;
             }
         }
-        public virtual void AlgorithmLoop(object sender, EventArgs e) { }        
+        // doesn't use the Init method because some slightly different stuff has to happen
+        public virtual void update(Grid grid, int rows, int cols)
+        {
+            this.grid.ColumnDefinitions.Clear();
+            this.grid.RowDefinitions.Clear();
+            this.rows = rows;
+            this.cols = cols;
+            open = new List<Node>();
+            closed = new List<Node>();
+            for (int i = 0; i < cols; i++)
+                this.grid.ColumnDefinitions.Add(new ColumnDefinition());
+            for (int i = 0; i < rows; i++)
+                this.grid.RowDefinitions.Add(new RowDefinition());
+
+            nodes.Clear();
+            for (int x = 0; x < cols; x++)
+            {
+                for (int y = 0; y < rows; y++)
+                {
+                    Node node = new Node(x, y);
+                    node.rect.Stroke = Brushes.Black;
+                    Grid.SetColumn(node.rect, x);
+                    Grid.SetRow(node.rect, y);
+                    this.grid.Children.Add(node.rect);
+                    nodes.Add(node);
+                }
+            }
+        }
+        public virtual void AlgorithmLoop(object sender, EventArgs e) { }               
     }    
   
     public class AStarAlgorithm : PathFindingAlgorithm
@@ -124,19 +156,13 @@ namespace Algorithm_Visualizer
         public static bool isStartDefined { get; set; }
         public static bool isEndDefined { get; set; }
         public static bool finished { get; set; }
-        public Node currentNode;
-        public Node startNode;
-        public Node endNode;
-        public List<Node> open;
-        private List<Node> closed;
-
         public AStarAlgorithm()
         {
-            this.rows = 10;
-            this.cols = 10;
-            this.algoType = Algorithms.A_STAR;
-            this.open = new List<Node>();
-            this.closed = new List<Node>();
+            rows = 10;
+            cols = 10;
+            algoType = Algorithms.A_STAR;
+            open = new List<Node>();
+            closed = new List<Node>();
             Init();                        
         }
         static AStarAlgorithm()
@@ -152,40 +178,44 @@ namespace Algorithm_Visualizer
             this.cols = cols;
             this.grid.Width = 1600;
             this.grid.Height = 800;
-            this.algoType = Algorithms.A_STAR;
-            this.open   = new List<Node>();
-            this.closed = new List<Node>();
+            algoType = Algorithms.A_STAR;
+            open     = new List<Node>();
+            closed   = new List<Node>();
             Init();
         }
-        public void DefineStartEnd()
+        public override void update(Grid grid, int rows, int cols)
+        {
+            base.update(grid, rows, cols);
+        }
+        private void DefineStartEnd()
         {
             foreach(Node n in this.nodes)
             {
                 if (n.isEnd)
                 {
                     endNode = n;
-                    isEndDefined = true;
+                    isEndDefined = true;                    
                 }
                 if(n.isStart)
                 {
                     startNode = n;
                     isStartDefined = true;
-                }
+                }                
             }
         }
         public override void AlgorithmLoop(object sender, EventArgs e)
-        {                      
+        {           
             if (!isStartDefined || !isEndDefined)
             {                              
-                DefineStartEnd();
+                DefineStartEnd();               
                 if (isStartDefined && isEndDefined)
-                {
+                {                    
                     currentNode = startNode;
                     open.Add(currentNode);                    
                 }
             }               
             if(open.Count > 0 && !finished)
-            {                
+            {
                 Node lowestNode = open[0];
                 foreach(Node node in open)
                     if (node.f < lowestNode.f)
@@ -226,17 +256,12 @@ namespace Algorithm_Visualizer
         public static bool isStartDefined { get; set; }
         public static bool isEndDefined { get; set; }
         public static bool finished { get; set; }
-        public Node currentNode;
-        public Node startNode;
-        public Node endNode;
-        public List<Node> open;
-        private List<Node> closed;
         public DijktrasAlgorithm(Grid grid, int rows, int cols)
         {
             this.grid = grid;
             this.rows = rows;
             this.cols = cols;
-            this.grid.Width = 1600;
+            this.grid.Width  = 1600;
             this.grid.Height = 800;
             this.algoType = Algorithms.DIJKSTRAS;
             closed = new List<Node>();
@@ -251,7 +276,17 @@ namespace Algorithm_Visualizer
             isStartDefined = false;
             finished = true;
         }
-        public void DefineStartEnd()
+        public override void update(Grid grid, int rows, int cols)
+        {
+            base.update(grid, rows, cols);
+            foreach (Node n in nodes)
+                open.Add(n);
+        }
+        /// <summary>
+        /// the A Star and the dijkstras versions of this method are a little different and they need access to the static variables
+        /// so i just made them as sepatate private methods
+        /// </summary>
+        private void DefineStartEnd()
         {
             foreach (Node n in this.nodes)
             {
@@ -271,7 +306,7 @@ namespace Algorithm_Visualizer
                     isStartDefined = true;
                 }
             }
-        }        
+        }   
         public override void AlgorithmLoop(object sender, EventArgs e)
         {
             if (!isStartDefined || !isEndDefined)
@@ -283,9 +318,9 @@ namespace Algorithm_Visualizer
                     open.Add(currentNode);
                     finished = false;
                 }
-            }
+            }            
             if(open.Count > 0 && !finished)
-            {                
+            {            
                 Node lowestDistNode = nodes[0];
                 foreach (Node n in open)
                     if (n.dist <= lowestDistNode.dist && !closed.Contains(n))
@@ -296,27 +331,23 @@ namespace Algorithm_Visualizer
                 closed.Add(currentNode);
                 if (currentNode == endNode)
                 {
-                    finished = true;
-                    Console.WriteLine("Found");
+                    finished = true;                   
                     retracePath(startNode, endNode);
                 }
                 else
-                {
+                {                    
                     List<Node> neighbors = findNeighbors(currentNode);                    
                     foreach(Node n in neighbors)
                     {
-                        if (n.blocked || closed.Contains(n) || (n.col == 0 && n.row == 0)) // node (0, 0) causes problems for some reason
+                        if (n.blocked || closed.Contains(n) || (n.col == 0 && n.row == 0)) // node (0, 0) causes problems for some reason so it doesn't check it
                             continue;
                         n.dist = currentNode.dist + 1.0f;
                         n.setColor(Node.Green);
-                        //float altDist = currentNode.dist + n.dist;
-                        //if (altDist < n.dist)
-                        //    n.dist = altDist;
+                        // no need to find an alternative shorter distance becaus they all have distance of 1                        
                         n.parent = currentNode;
                     }
                 }
             }
-        }
-        
+        }        
     }
 }

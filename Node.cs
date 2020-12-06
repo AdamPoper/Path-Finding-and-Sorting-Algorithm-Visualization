@@ -17,6 +17,7 @@ namespace Algorithm_Visualizer
 {
     public class Node
     {
+        public static TabControl theTabs;
         public int row { get; set; }
         public int col { get; set; }
         public Rectangle rect;
@@ -34,7 +35,6 @@ namespace Algorithm_Visualizer
         public float h { get; set; }  ///  These values are for the a star algorithm    
         public float f { get; set; }  /// </summary>
         public float dist { get; set; }  // for dijkstras
-        public static PathFindingAlgorithm.Algorithms activeAlgorithm;
         public Node parent;
         public Node()
         {
@@ -85,19 +85,17 @@ namespace Algorithm_Visualizer
             // this function needs to filter out which algorithm is being performed so the events are handled properly
 
             // For A Star
-            if (Mouse.LeftButton == MouseButtonState.Pressed) 
-            {
+            if (Mouse.LeftButton == MouseButtonState.Pressed && theTabs.SelectedIndex == 0) 
+            {               
                 if (Keyboard.IsKeyDown(Key.S) && !AStarAlgorithm.isStartDefined)
                 {
-                    setColor(Node.Blue);
-                    this.isStart = true;
-                    Console.WriteLine("Setting the start node");
+                    setColor(Node.Blue);                    
+                    this.isStart = true;                                      
                 }
                 else if (Keyboard.IsKeyDown(Key.E) && !AStarAlgorithm.isEndDefined)
                 {
                     setColor(Node.Purple);
-                    this.isEnd = true;                   
-                    Console.WriteLine("Setting the end node");                   
+                    this.isEnd = true;                    
                 }
                 else
                 {
@@ -106,19 +104,17 @@ namespace Algorithm_Visualizer
                 }               
             }
             // For dijkstras
-            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            if (Mouse.LeftButton == MouseButtonState.Pressed && theTabs.SelectedIndex == 1)
             {
                 if (Keyboard.IsKeyDown(Key.S) && !DijktrasAlgorithm.isStartDefined)
                 {
                     setColor(Node.Blue);
-                    this.isStart = true;
-                    Console.WriteLine("Setting the start node");
+                    this.isStart = true;                   
                 }
                 else if (Keyboard.IsKeyDown(Key.E) && !DijktrasAlgorithm.isEndDefined)
                 {
                     setColor(Node.Purple);
-                    this.isEnd = true;
-                    Console.WriteLine("Setting the end node");
+                    this.isEnd = true;                    
                 }
                 else
                 {

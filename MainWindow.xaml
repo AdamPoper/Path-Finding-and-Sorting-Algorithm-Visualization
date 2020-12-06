@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Algorithm_Visualizer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="1800" Name="window">
+        Title="MainWindow" Height="1012" Width="1800" Name="window">
 
-    <StackPanel Name="panel">
+    <StackPanel Name="panel" Orientation="Vertical">
         <TabControl Name="tabs">
             <TabItem Name="aStarTab" Header="A Star" TabIndex="0">
                 <Grid Name="aStarGrid">
@@ -31,5 +31,15 @@
                 </StackPanel>
             </TabItem>
         </TabControl>
+        <StackPanel Orientation="Horizontal">
+            <Label Margin="10, 10, 10, 10">Number of Columns </Label>
+            <TextBox Name="columnBox" Width="80" Height="20" Margin="10, 10, 10, 10">Columns</TextBox>
+            <Label Margin="10, 10, 10, 10">Number of Rows</Label>
+            <TextBox Name="rowBox" Width="80" Height="20" Margin="10, 10, 10, 10">Columns</TextBox>
+            <Button Name="updateGridButton" Width="80" Height="25" Margin="10, 10, 100, 10" Click="updateGridChanges">Update</Button>
+            <Label Margin="10, 10, 10, 10">Number of Sorting Bars</Label>
+            <TextBox Name="BarBox" Margin="10, 10, 10, 10" Width="80" Height="20">Count</TextBox>
+            <Button Name="updateBars" Margin="10, 10, 10, 10" Width="80" Height="25" Click="updateSortingChanges">Update</Button>
+        </StackPanel>
     </StackPanel>
 </Window>
