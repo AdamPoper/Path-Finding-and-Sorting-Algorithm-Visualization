@@ -15,4 +15,4 @@ For the sorting algorithms, just press the space bar to start the visualization.
 The number of bars to be sorted can also be changed by using the UI controls at the bottom.
 
 
-![](appImage.png)
+![](unsortedImg.png)
