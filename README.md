@@ -13,3 +13,5 @@ The number of rows and columns can also be changed using the UI controls below t
 
 For the sorting algorithms, just press the space bar to start the visualization. 
 The number of bars to be sorted can also be changed by using the UI controls at the bottom.
+
+Restart the algorithms by relaunching the app.
